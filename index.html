@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LindiMaps | Inteligjenca Hapësinore</title>
+    <link rel="canonical" href="https://lindimaps.com/" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .hero-bg { background-image: linear-gradient(rgba(15,23,42,.76), rgba(15,23,42,.78)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; }
+        .logo-gradient { background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        html { scroll-behavior: smooth; }
+        #scroll-to-top {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(20px);
+        }
+        #scroll-to-top.show { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
+        @keyframes pulse-dot { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+        .animate-dot { animation: pulse-dot 2s infinite ease-in-out; transform-origin: center; }
+        .logo-container:hover .logo-bg { background-color: #2563eb; }
+        .logo-bg { transition: background-color 0.3s ease; }
+        .lang-switcher-side {
+            position: fixed; left: 20px; top: 50%; transform: translateY(-50%); z-index: 2000;
+            display: flex; flex-direction: row; gap: 8px; background: rgba(255,255,255,.82); backdrop-filter: blur(10px);
+            padding: 6px; border-radius: 12px; border: 1px solid rgba(0,0,0,.05); box-shadow: 0 10px 25px -5px rgba(0,0,0,.1);
+        }
+        .lang-item { display:flex; align-items:center; justify-content:center; transition:all .3s ease; padding:2px; border-radius:6px; }
+        .lang-item:hover { transform:scale(1.1); background:white; }
+        .lang-item.active { box-shadow:0 0 0 2px #3b82f6; }
+        .flag-icon { width:20px; height:14px; object-fit:cover; border-radius:2px; display:block; }
+        .grid-glow { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(circle at center, black 30%, transparent 80%); }
+        .glass-card { background: rgba(255,255,255,.08); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.12); }
+        .section-card { transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease; }
+        .section-card:hover { transform: translateY(-7px); box-shadow: 0 28px 60px rgba(15,23,42,.12); border-color: rgba(59,130,246,.28); }
+        .service-tab.active { background:#0f172a; color:#fff; border-color:#0f172a; }
+        .service-panel { display:none; }
+        .service-panel.active { display:block; }
+        .timeline-line::before { content:""; position:absolute; left:11px; top:18px; bottom:-18px; width:2px; background:#cbd5e1; }
+        #map-container { position: relative; }
+        #satellite-scanner { position:absolute; z-index:500; pointer-events:none; display:flex; flex-direction:column; align-items:center; justify-content:center; transform:translate(-50%,-50%); }
+        .satellite-body { background:#0f172a; padding:8px 12px; border-radius:12px; display:flex; align-items:center; gap:8px; border:1px solid #3b82f6; box-shadow:0 0 20px rgba(59,130,246,.4); animation: float 3s infinite ease-in-out; }
+        @keyframes float { 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-10px);} }
+        .scanning-beam { position:absolute; top:50%; width:150px; height:150px; background: radial-gradient(circle, rgba(59,130,246,.4) 0%, rgba(59,130,246,0) 70%); border-radius:50%; transform:scale(0); animation: scan-pulse 2s infinite ease-out; }
+        @keyframes scan-pulse { 0%{ transform:scale(.2); opacity:.8;} 100%{ transform:scale(2.5); opacity:0;} }
+        .beam-line { position:absolute; top:50%; width:2px; height:80px; background:linear-gradient(to bottom, #3b82f6, transparent); transform-origin:top; }
+        .academy-logo-text { color: #1e293b; }
+        .academy-maps-text { background: linear-gradient(to right, #38bdf8, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-number { font-variant-numeric: tabular-nums; }
+        @media (max-width: 768px) {
+            .lang-switcher-side { left: 12px; top: auto; bottom: 16px; transform:none; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
+
+    <div class="lang-switcher-side">
+        <a href="index.html" class="lang-item active" title="Shqip"><img src="https://flagcdn.com/w40/al.png" alt="AL" class="flag-icon"></a>
+        <a href="/en/" class="lang-item" title="English"><img src="https://flagcdn.com/w40/gb.png" alt="EN" class="flag-icon"></a>
+    </div>
+
+    <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-[1000] border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3 group logo-container">
+                <div class="logo-bg h-11 w-11 flex items-center justify-center bg-slate-900 rounded-xl shadow-md">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white" fill-opacity="0.2"/>
+                        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                        <circle class="animate-dot" cx="12" cy="11" r="2.5" fill="#3b82f6" stroke="white" stroke-width="1.2"/>
+                    </svg>
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-2xl font-black tracking-tighter leading-none"><span class="text-slate-900">LINDI</span><span class="logo-gradient">MAPS</span></h1>
+                    <span class="text-[9px] uppercase tracking-[0.4em] font-bold text-slate-400 mt-1">Spatial Intelligence</span>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center space-x-8 font-bold text-[13px] uppercase tracking-widest text-slate-600">
+                <a href="index.html" class="text-blue-600 border-b-2 border-blue-600 pb-1">Kreu</a>
+                <a href="/sq/sherbime/" class="hover:text-blue-600 transition pb-1">Shërbime</a>
+                <a href="/sq/projekte/" class="hover:text-blue-600 transition pb-1">Projekte</a>
+                <a href="/sq/rreth_nesh/" class="hover:text-blue-600 transition pb-1">Rreth Nesh</a>
+                <a href="/sq/kontakte/" class="hover:text-blue-600 transition pb-1">Kontakte</a>
+                <a href="/sq/akademia/" class="flex items-center gap-3 group">
+                    <div class="h-10 w-10 flex items-center justify-center bg-[#0f172a] rounded-xl shadow-md group-hover:bg-blue-600 transition-colors">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                            <circle class="animate-dot" cx="12" cy="11" r="2.2" fill="#3b82f6" stroke="white" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <div class="flex flex-col">
+                        <h1 class="text-lg font-black tracking-tighter leading-none"><span class="academy-logo-text">LINDI</span><span class="academy-maps-text">MAPS</span></h1>
+                        <span class="text-[8px] uppercase tracking-[0.3em] font-bold text-slate-400">Academy</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="md:hidden flex items-center gap-4">
+                <button id="menu-btn" class="p-2 text-slate-900 focus:outline-none">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 px-6 py-8 space-y-6 shadow-2xl animate-in slide-in-from-top duration-300">
+            <a href="index.html" class="block text-xl font-black text-blue-600">Kreu</a>
+            <a href="/sq/sherbime/" class="block text-xl font-black text-slate-700">Shërbime</a>
+            <a href="/sq/projekte/" class="block text-xl font-black text-slate-700">Projekte</a>
+            <a href="/sq/rreth_nesh/" class="block text-xl font-black text-slate-700">Rreth Nesh</a>
+            <a href="/sq/kontakte/" class="block text-xl font-black text-slate-700">Kontakte</a>
+            <a href="/sq/akademia/" class="flex items-center gap-3 pt-4 border-t border-slate-100">
+                <div class="h-10 w-10 flex items-center justify-center bg-[#0f172a] rounded-xl shadow-md">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" stroke="white" stroke-width="2" stroke-linejoin="round"/><circle class="animate-dot" cx="12" cy="11" r="2.2" fill="#3b82f6" stroke="white" stroke-width="1"/></svg>
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-lg font-black tracking-tighter leading-none"><span class="academy-logo-text">LINDI</span><span class="academy-maps-text">MAPS</span></h1>
+                    <span class="text-[8px] uppercase tracking-[0.3em] font-bold text-slate-400">Academy</span>
+                </div>
+            </a>
+        </div>
+    </nav>
+
+    <header class="hero-bg relative overflow-hidden text-white">
+        <div class="grid-glow"></div>
+        <div class="relative z-10 max-w-7xl mx-auto px-6 py-24 md:py-32">
+            <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-12 items-center">
+                <div>
+                    <div class="inline-flex items-center gap-3 px-4 py-2 rounded-full glass-card text-[11px] uppercase tracking-[0.25em] font-black text-blue-200 mb-6">
+                        GIS • Remote Sensing • WebGIS • Academy
+                    </div>
+                    <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-[0.95] mb-6">
+                        Zgjidhje të plota <span class="text-blue-400">gjeohapësinore</span> në një faqe të vetme
+                    </h2>
+                    <p class="text-slate-200 text-lg md:text-xl leading-relaxed max-w-2xl mb-8">
+                        Në faqen kryesore tashmë përfshihen shërbimet, projektet, profili profesional, akademia dhe kontakti — që vizitori të kuptojë menjëherë çfarë ofron LindiMaps.
+                    </p>
+                    <div class="flex flex-wrap gap-4 mb-10">
+                        <a href="/sq/kontakte/" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-black uppercase tracking-wider shadow-2xl shadow-blue-900/30">Nis Projektin</a>
+                        <a href="/sq/projekte/" class="border border-white/20 hover:border-blue-400 hover:bg-white/5 px-7 py-4 rounded-2xl font-black uppercase tracking-wider">Shiko Projektet</a>
+                        <a href="#ekosistemi" class="border border-white/20 hover:border-blue-400 hover:bg-white/5 px-7 py-4 rounded-2xl font-black uppercase tracking-wider">Eksploro Faqen</a>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="glass-card rounded-3xl p-5">
+                            <div class="text-3xl font-black stat-number" data-count="6">0</div>
+                            <p class="text-sm text-slate-300 mt-2">Linja kryesore shërbimesh</p>
+                        </div>
+                        <div class="glass-card rounded-3xl p-5">
+                            <div class="text-3xl font-black stat-number" data-count="4">0</div>
+                            <p class="text-sm text-slate-300 mt-2">Shtylla të përmbajtjes</p>
+                        </div>
+                        <div class="glass-card rounded-3xl p-5">
+                            <div class="text-3xl font-black stat-number" data-count="3">0</div>
+                            <p class="text-sm text-slate-300 mt-2">Shembuj projektesh</p>
+                        </div>
+                        <div class="glass-card rounded-3xl p-5">
+                            <div class="text-3xl font-black stat-number" data-count="3">0</div>
+                            <p class="text-sm text-slate-300 mt-2">Module Academy</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="bg-white/10 border border-white/15 rounded-[2rem] p-5 md:p-7 backdrop-blur-xl shadow-2xl">
+                        <div class="rounded-[1.5rem] overflow-hidden border border-white/10 bg-slate-950/50">
+                            <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&q=80&w=1200" alt="GIS dashboard" class="w-full h-[280px] md:h-[360px] object-cover opacity-80">
+                        </div>
+                        <div class="grid sm:grid-cols-2 gap-4 mt-5">
+                            <div class="bg-white/5 rounded-2xl p-4 border border-white/10">
+                                <div class="text-xs uppercase tracking-[0.25em] font-black text-blue-300 mb-2">Shërbime</div>
+                                <p class="text-sm text-slate-200">GIS, fotogrametri, analizë territori, kadastra, konsulencë teknike dhe WebGIS.</p>
+                            </div>
+                            <div class="bg-white/5 rounded-2xl p-4 border border-white/10">
+                                <div class="text-xs uppercase tracking-[0.25em] font-black text-emerald-300 mb-2">Academy</div>
+                                <p class="text-sm text-slate-200">Trajnime të fokusuara në QGIS, ArcGIS Pro dhe Global Mapper.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-6 -left-6 bg-white text-slate-900 rounded-3xl px-5 py-4 shadow-2xl border border-slate-100 hidden md:block">
+                        <div class="text-xs uppercase tracking-[0.25em] font-black text-blue-600 mb-1">Fokus</div>
+                        <div class="font-black text-lg">Spatial Intelligence Studio</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="ekosistemi" class="py-20 max-w-7xl mx-auto px-6">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <span class="inline-flex px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 text-[11px] uppercase tracking-[0.3em] font-black">Pamje e plotë</span>
+            <h3 class="text-3xl md:text-5xl font-black tracking-tighter mt-5 mb-4">Gjithë informacioni kryesor, i përmbledhur në homepage</h3>
+            <p class="text-slate-600 text-lg">Kjo pjesë i jep vizitorit një hyrje të shpejtë në çdo seksion të faqes pa pasur nevojë të navigojë menjëherë nëpër nënfaqe.</p>
+        </div>
+        <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <a href="/sq/sherbime/" class="section-card bg-white rounded-[2rem] p-7 border border-slate-200 shadow-lg shadow-slate-200/40 block">
+                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-5"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg></div>
+                <h4 class="text-2xl font-black tracking-tighter mb-3">Shërbime</h4>
+                <p class="text-slate-600 leading-relaxed">Nga bazat e të dhënave gjeografike te hartat web dhe analizat territoriale.</p>
+            </a>
+            <a href="/sq/projekte/" class="section-card bg-white rounded-[2rem] p-7 border border-slate-200 shadow-lg shadow-slate-200/40 block">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-5"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M6 3h12a1 1 0 011 1v16l-4-2-4 2-4-2-4 2V4a1 1 0 011-1z"></path></svg></div>
+                <h4 class="text-2xl font-black tracking-tighter mb-3">Projekte</h4>
+                <p class="text-slate-600 leading-relaxed">Portofol nga WebGIS, monitorim satelitor dhe modele 3D për trashëgimi kulturore.</p>
+            </a>
+            <a href="/sq/rreth_nesh/" class="section-card bg-white rounded-[2rem] p-7 border border-slate-200 shadow-lg shadow-slate-200/40 block">
+                <div class="w-14 h-14 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center mb-5"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9 9 0 1118.9 5.124M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
+                <h4 class="text-2xl font-black tracking-tighter mb-3">Rreth Nesh</h4>
+                <p class="text-slate-600 leading-relaxed">Profil i themeluesit, historia, vlerat dhe pozicionimi profesional i studios.</p>
+            </a>
+            <a href="/sq/akademia/" class="section-card bg-white rounded-[2rem] p-7 border border-slate-200 shadow-lg shadow-slate-200/40 block">
+                <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-5"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422A12.083 12.083 0 0112 20.055a12.083 12.083 0 01-6.16-9.477L12 14z"></path></svg></div>
+                <h4 class="text-2xl font-black tracking-tighter mb-3">Academy</h4>
+                <p class="text-slate-600 leading-relaxed">Trajnime praktike për software-t kryesorë të GIS dhe menaxhimin profesional të të dhënave.</p>
+            </a>
+        </div>
+    </section>
+
+    <section class="py-20 bg-white border-y border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-[0.9fr_1.1fr] gap-14 items-start">
+            <div>
+                <span class="inline-flex px-4 py-1.5 rounded-full bg-slate-100 text-slate-700 text-[11px] uppercase tracking-[0.3em] font-black">Shërbimet kryesore</span>
+                <h3 class="text-3xl md:text-5xl font-black tracking-tighter mt-5 mb-4">Interaktivitet më i lartë me përmbajtje të zgjeruar</h3>
+                <p class="text-slate-600 text-lg leading-relaxed mb-8">Për të shmangur një homepage të varfër, shërbimet janë futur si panele dinamike që i japin vizitorit informacion pa e larguar nga faqja e parë.</p>
+                <div class="grid sm:grid-cols-2 gap-4 text-sm text-slate-600">
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">Implementimi i bazave të të dhënave gjeografike, analizave hapësinore dhe hartografisë tematike.</div>
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">Përpunimi i imazheve nga dronët për ortofoto, modele 3D dhe DSM/DTM.</div>
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">Studime mbi përdorimin e tokës, monitorimin urban dhe vlerësimin e rreziqeve natyrore.</div>
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">WebGIS, konsulencë teknike dhe dixhitalizim kadastral.</div>
+                </div>
+            </div>
+            <div>
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <button class="service-tab active px-5 py-3 rounded-2xl border border-slate-200 font-black text-sm uppercase tracking-wider" data-target="service-1">GIS</button>
+                    <button class="service-tab px-5 py-3 rounded-2xl border border-slate-200 font-black text-sm uppercase tracking-wider" data-target="service-2">Fotogrametri</button>
+                    <button class="service-tab px-5 py-3 rounded-2xl border border-slate-200 font-black text-sm uppercase tracking-wider" data-target="service-3">Territori</button>
+                    <button class="service-tab px-5 py-3 rounded-2xl border border-slate-200 font-black text-sm uppercase tracking-wider" data-target="service-4">WebGIS</button>
+                </div>
+                <div id="service-1" class="service-panel active bg-slate-950 text-white rounded-[2rem] p-8 shadow-2xl">
+                    <div class="text-xs uppercase tracking-[0.3em] text-blue-300 font-black mb-3">Sistemet GIS</div>
+                    <h4 class="text-3xl font-black tracking-tighter mb-4">Analizë, strukturim dhe vendimmarrje mbi të dhëna hapësinore</h4>
+                    <p class="text-slate-300 leading-relaxed mb-6">Implementimi i bazave të të dhënave gjeografike, analizave hapësinore dhe hartografisë tematike për sektorin publik dhe privat.</p>
+                    <a href="/sq/sherbime/" class="inline-flex items-center gap-2 text-blue-300 font-black uppercase tracking-wider text-sm">Më shumë <span>→</span></a>
+                </div>
+                <div id="service-2" class="service-panel bg-slate-950 text-white rounded-[2rem] p-8 shadow-2xl">
+                    <div class="text-xs uppercase tracking-[0.3em] text-blue-300 font-black mb-3">Fotogrametri</div>
+                    <h4 class="text-3xl font-black tracking-tighter mb-4">Modele 3D dhe ortofoto me rezolucion të lartë</h4>
+                    <p class="text-slate-300 leading-relaxed mb-6">Përpunimi i imazheve nga dronët për gjenerimin e modeleve 3D, ortofotove me rezolucion të lartë dhe modeleve të lartësisë.</p>
+                    <a href="/sq/sherbime/" class="inline-flex items-center gap-2 text-blue-300 font-black uppercase tracking-wider text-sm">Më shumë <span>→</span></a>
+                </div>
+                <div id="service-3" class="service-panel bg-slate-950 text-white rounded-[2rem] p-8 shadow-2xl">
+                    <div class="text-xs uppercase tracking-[0.3em] text-blue-300 font-black mb-3">Analizë Territori</div>
+                    <h4 class="text-3xl font-black tracking-tighter mb-4">Monitorim urban, tokë dhe rreziqe natyrore</h4>
+                    <p class="text-slate-300 leading-relaxed mb-6">Studime mbi përdorimin e tokës, monitorimin e zonave urbane dhe vlerësimin e rreziqeve natyrore përmes metodave gjeohapësinore.</p>
+                    <a href="/sq/sherbime/" class="inline-flex items-center gap-2 text-blue-300 font-black uppercase tracking-wider text-sm">Më shumë <span>→</span></a>
+                </div>
+                <div id="service-4" class="service-panel bg-slate-950 text-white rounded-[2rem] p-8 shadow-2xl">
+                    <div class="text-xs uppercase tracking-[0.3em] text-blue-300 font-black mb-3">WebGIS & Konsulencë</div>
+                    <h4 class="text-3xl font-black tracking-tighter mb-4">Harta, aplikacione web dhe asistencë teknike</h4>
+                    <p class="text-slate-300 leading-relaxed mb-6">Krijimi i hartave dhe aplikacioneve Web GIS, asistencë profesionale në zgjedhjen e teknologjive hapësinore dhe menaxhim projektesh.</p>
+                    <a href="/sq/sherbime/" class="inline-flex items-center gap-2 text-blue-300 font-black uppercase tracking-wider text-sm">Më shumë <span>→</span></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 max-w-7xl mx-auto px-6">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
+            <div>
+                <span class="inline-flex px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 text-[11px] uppercase tracking-[0.3em] font-black">Portofol i zgjeruar</span>
+                <h3 class="text-3xl md:text-5xl font-black tracking-tighter mt-5">Shembuj projektesh në faqen e parë</h3>
+            </div>
+            <a href="/sq/projekte/" class="text-sm uppercase tracking-[0.25em] font-black text-slate-700">Shko te portofoli →</a>
+        </div>
+        <div class="grid lg:grid-cols-3 gap-6">
+            <article class="section-card bg-white border border-slate-200 rounded-[2rem] overflow-hidden shadow-lg shadow-slate-200/40">
+                <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=1200" alt="WebGIS" class="w-full h-56 object-cover">
+                <div class="p-7">
+                    <div class="text-xs uppercase tracking-[0.3em] font-black text-blue-600 mb-3">Teknologji Cloud</div>
+                    <h4 class="text-2xl font-black tracking-tighter mb-3">Ndërtimi WEB GIS Lubonjë</h4>
+                    <p class="text-slate-600 leading-relaxed">Platformë interaktive për dokumentimin e zonave të trashëgimisë kulturore me akses në të dhënat hapësinore përmes teknologjisë cloud.</p>
+                    <div class="mt-5 text-sm font-bold text-slate-500">Korçë, 2024</div>
+                </div>
+            </article>
+            <article class="section-card bg-white border border-slate-200 rounded-[2rem] overflow-hidden shadow-lg shadow-slate-200/40">
+                <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=1200" alt="Monitorim pyjesh" class="w-full h-56 object-cover">
+                <div class="p-7">
+                    <div class="text-xs uppercase tracking-[0.3em] font-black text-emerald-600 mb-3">Monitorim Satelitor</div>
+                    <h4 class="text-2xl font-black tracking-tighter mb-3">Monitorimi i Pyjeve</h4>
+                    <p class="text-slate-600 leading-relaxed">Analizë gjeohapësinore e mbulesës tokës duke përdorur Inteligjencën Artificiale për identifikimin e ndryshimeve në biomasë.</p>
+                    <div class="mt-5 text-sm font-bold text-slate-500">Remote Sensing & AI</div>
+                </div>
+            </article>
+            <article class="section-card bg-white border border-slate-200 rounded-[2rem] overflow-hidden shadow-lg shadow-slate-200/40">
+                <img src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&q=80&w=1200" alt="Model 3D" class="w-full h-56 object-cover">
+                <div class="p-7">
+                    <div class="text-xs uppercase tracking-[0.3em] font-black text-violet-600 mb-3">Fotogrametri 3D</div>
+                    <h4 class="text-2xl font-black tracking-tighter mb-3">Kalaja Lezhë 3D</h4>
+                    <p class="text-slate-600 leading-relaxed">Gjenerimi i modeleve 3D të kalasë së Lezhës duke përdorur fotogrametrinë për ruajtjen dixhitale të monumentit.</p>
+                    <div class="mt-5 text-sm font-bold text-slate-500">Lezhë, 2025</div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="py-20 bg-slate-950 text-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-[0.95fr_1.05fr] gap-14 items-center">
+            <div>
+                <span class="inline-flex px-4 py-1.5 rounded-full bg-white/10 text-blue-300 text-[11px] uppercase tracking-[0.3em] font-black">Rreth Nesh</span>
+                <h3 class="text-3xl md:text-5xl font-black tracking-tighter mt-5 mb-5">Autoritet profesional dhe histori e integruar në homepage</h3>
+                <p class="text-slate-300 text-lg leading-relaxed mb-8">Profili i themeluesit, fokusi profesional dhe vlerat kryesore janë futur në faqen e parë për ta bërë brandin më të besueshëm dhe më të plotë.</p>
+                <div class="space-y-5">
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-300 flex items-center justify-center shrink-0">01</div>
+                        <div>
+                            <h4 class="font-black text-xl mb-1">Ekspertizë në Gjeoinformatikë</h4>
+                            <p class="text-slate-400">Analizë gjeohapësinore, përpunim të dhënash satelitore dhe implementim teknologjish GIS në projekte kombëtare e ndërkombëtare.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-300 flex items-center justify-center shrink-0">02</div>
+                        <div>
+                            <h4 class="font-black text-xl mb-1">Vlerat bazë</h4>
+                            <p class="text-slate-400">Risi në GIS, integritet i të dhënave dhe transparencë profesionale në çdo projekt.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-300 flex items-center justify-center shrink-0">03</div>
+                        <div>
+                            <h4 class="font-black text-xl mb-1">Qasje e orientuar te rezultati</h4>
+                            <p class="text-slate-400">Produkte gjeohapësinore që mbështesin vendimmarrjen e bazuar në të dhëna dhe bashkëpunimin ndërdisiplinor.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6 items-stretch">
+                <div class="bg-white/5 border border-white/10 rounded-[2rem] p-7 md:col-span-2">
+                    <div class="text-xs uppercase tracking-[0.3em] text-blue-300 font-black mb-2">Mesazhi i themeluesit</div>
+                    <h4 class="text-3xl font-black tracking-tighter mb-4">M.Sc Erland Alla</h4>
+                    <p class="text-slate-300 leading-relaxed">Inxhinier gjeoinformatikë me përvojë të gjerë në analiza gjeohapësinore, përpunim të të dhënave satelitore dhe produkte të avancuara që i japin kuptim territorit.</p>
+                    <a href="/sq/rreth_nesh/" class="inline-flex mt-6 items-center gap-2 text-blue-300 font-black uppercase tracking-wider text-sm">Lexo profilin e plotë <span>→</span></a>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-[2rem] p-7">
+                    <div class="text-xs uppercase tracking-[0.3em] text-emerald-300 font-black mb-2">Specializimi</div>
+                    <div class="text-2xl font-black tracking-tighter">GIS • Remote Sensing • Spatial Intelligence</div>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-[2rem] p-7">
+                    <div class="text-xs uppercase tracking-[0.3em] text-violet-300 font-black mb-2">Rrjeti Profesional</div>
+                    <div class="text-2xl font-black tracking-tighter">Publikime, CV, prezencë dixhitale</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-[1fr_.95fr] gap-14 items-start">
+            <div>
+                <span class="inline-flex px-4 py-1.5 rounded-full bg-amber-50 text-amber-700 text-[11px] uppercase tracking-[0.3em] font-black">LindiMaps Academy</span>
+                <h3 class="text-3xl md:text-5xl font-black tracking-tighter mt-5 mb-4">Edhe trajnimi bëhet pjesë e historisë që në hyrje</h3>
+                <p class="text-slate-600 text-lg leading-relaxed mb-8">Homepage tani prezanton menjëherë anën edukative të brandit me programet kryesore dhe CTA drejt akademisë.</p>
+                <div class="space-y-4">
+                    <div class="timeline-line relative pl-10 pb-8">
+                        <div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-amber-400 border-4 border-amber-100"></div>
+                        <h4 class="font-black text-xl">QGIS</h4>
+                        <p class="text-slate-600 mt-1">Menaxhimi i të dhënave dhe hartografia profesionale me qGIS.</p>
+                    </div>
+                    <div class="timeline-line relative pl-10 pb-8">
+                        <div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-blue-500 border-4 border-blue-100"></div>
+                        <h4 class="font-black text-xl">ArcGIS Pro</h4>
+                        <p class="text-slate-600 mt-1">Workflow profesional për analizë, menaxhim të të dhënave dhe prodhim hartash.</p>
+                    </div>
+                    <div class="relative pl-10">
+                        <div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-emerald-500 border-4 border-emerald-100"></div>
+                        <h4 class="font-black text-xl">Global Mapper</h4>
+                        <p class="text-slate-600 mt-1">Përpunim i të dhënave dhe hartografi profesionale me fokus praktik.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-slate-950 rounded-[2rem] p-8 text-white shadow-2xl">
+                <div class="text-xs uppercase tracking-[0.3em] text-amber-300 font-black mb-3">Application Form</div>
+                <h4 class="text-3xl font-black tracking-tighter mb-4">Platforma juaj për zhvillim profesional në GIS</h4>
+                <p class="text-slate-300 leading-relaxed mb-8">Përzgjidhni modulin, shihni silabusin e detajuar dhe kaloni drejt regjistrimit nga faqja e akademisë.</p>
+                <div class="grid sm:grid-cols-2 gap-4 mb-8">
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4">Silabusi i Detajuar</div>
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4">Regjistrohu Tani</div>
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4">Përzgjidhni Modulin</div>
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4">Aksesimi i Materialit</div>
+                </div>
+                <a href="/sq/akademia/" class="inline-flex items-center justify-center bg-white text-slate-950 px-6 py-4 rounded-2xl font-black uppercase tracking-wider hover:bg-blue-50 transition">Hyr në Academy</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-slate-50 border-y border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-[0.95fr_1.05fr] gap-14 items-start">
+            <div>
+                <span class="inline-flex px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 text-[11px] uppercase tracking-[0.3em] font-black">Procesi</span>
+                <h3 class="text-3xl md:text-5xl font-black tracking-tighter mt-5 mb-4">Si punojmë ne</h3>
+                <p class="text-slate-600 text-lg leading-relaxed">Procesi i faqes së shërbimeve është sjellë edhe në homepage që vizitori të kuptojë metodën e punës: nga mbledhja e të dhënave deri te dorëzimi i projektit.</p>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-5">
+                <div class="section-card bg-white rounded-[2rem] p-6 border border-slate-200 shadow-lg shadow-slate-200/30">
+                    <div class="text-4xl font-black text-blue-600 mb-3">01</div>
+                    <h4 class="text-xl font-black mb-2">Mbledhja e të Dhënave</h4>
+                    <p class="text-slate-600">Përdorimi i sensorëve dhe burimeve zyrtare për informacionin bazë.</p>
+                </div>
+                <div class="section-card bg-white rounded-[2rem] p-6 border border-slate-200 shadow-lg shadow-slate-200/30">
+                    <div class="text-4xl font-black text-blue-600 mb-3">02</div>
+                    <h4 class="text-xl font-black mb-2">Përpunimi & Analiza</h4>
+                    <p class="text-slate-600">Transformimi i të dhënave në inteligjencë përmes metodave GIS.</p>
+                </div>
+                <div class="section-card bg-white rounded-[2rem] p-6 border border-slate-200 shadow-lg shadow-slate-200/30">
+                    <div class="text-4xl font-black text-blue-600 mb-3">03</div>
+                    <h4 class="text-xl font-black mb-2">Vlerësimi i Cilësisë</h4>
+                    <p class="text-slate-600">Kontroll rigoroz teknik për saktësi gjeometrike dhe atributive.</p>
+                </div>
+                <div class="section-card bg-white rounded-[2rem] p-6 border border-slate-200 shadow-lg shadow-slate-200/30">
+                    <div class="text-4xl font-black text-blue-600 mb-3">04</div>
+                    <h4 class="text-xl font-black mb-2">Dorëzimi i Projektit</h4>
+                    <p class="text-slate-600">Prezantim përmes hartave interaktive, raporteve dhe produkteve finale.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-[1fr_.95fr] gap-14 items-center">
+            <div>
+                <span class="inline-flex px-4 py-1.5 rounded-full bg-slate-100 text-slate-700 text-[11px] uppercase tracking-[0.3em] font-black">Na kontaktoni</span>
+                <h3 class="text-3xl md:text-5xl font-black tracking-tighter mt-5 mb-4">Kontakt i qartë dhe i dukshëm që në faqen e parë</h3>
+                <p class="text-slate-600 text-lg leading-relaxed mb-8">Përveç hartës, u shtua edhe blloku i kontaktit me email, orar dhe thirrje të qartë për veprim.</p>
+                <div class="grid sm:grid-cols-3 gap-4">
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200">
+                        <div class="text-xs uppercase tracking-[0.25em] font-black text-blue-600 mb-2">Email</div>
+                        <div class="font-bold text-slate-800 break-all">contact.lindimap@gmail.com</div>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200">
+                        <div class="text-xs uppercase tracking-[0.25em] font-black text-blue-600 mb-2">Vendndodhja</div>
+                        <div class="font-bold text-slate-800">Tiranë, Shqipëri</div>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200">
+                        <div class="text-xs uppercase tracking-[0.25em] font-black text-blue-600 mb-2">Orari</div>
+                        <div class="font-bold text-slate-800">Hën - Pre | 09:00 - 17:00</div>
+                    </div>
+                </div>
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a href="/sq/kontakte/" class="bg-slate-950 hover:bg-blue-600 text-white px-7 py-4 rounded-2xl font-black uppercase tracking-wider transition">Shko te Kontaktet</a>
+                    <a href="mailto:contact.lindimap@gmail.com" class="border border-slate-300 hover:border-blue-500 px-7 py-4 rounded-2xl font-black uppercase tracking-wider transition">Dërgo Email</a>
+                </div>
+            </div>
+
+            <div id="map-container" class="relative rounded-[3rem] bg-gradient-to-b from-slate-100 to-white p-4 shadow-2xl shadow-slate-200/60 border border-slate-100">
+                <div id="satellite-scanner">
+                    <div class="scanning-beam"></div>
+                    <div class="beam-line"></div>
+                    <div class="satellite-body">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="white"/>
+                            <circle cx="12" cy="11" r="2.5" fill="#3b82f6"/>
+                        </svg>
+                        <span class="text-[10px] font-black text-white tracking-widest uppercase">LindiMaps</span>
+                    </div>
+                </div>
+                <div id="map" class="h-[500px] md:h-[680px] rounded-[3rem] shadow-2xl border-[12px] md:border-[20px] border-white overflow-hidden z-10"></div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-950 text-white border-t border-white/5 pt-20 pb-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div class="space-y-6">
+                    <a href="/" class="flex items-center gap-3">
+                        <div class="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
+                        </div>
+                        <h4 class="text-2xl font-black tracking-tighter uppercase leading-none">LINDI<span class="text-blue-500">MAPS</span></h4>
+                    </a>
+                    <p class="text-slate-400 text-sm leading-relaxed max-w-xs">Studio e specializuar në Inteligjencë Hapësinore, GIS dhe Remote Sensing.</p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 transition-colors"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 transition-colors"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+                    </div>
+                </div>
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Eksploro</h5>
+                    <ul class="space-y-4 text-sm text-slate-400 font-medium">
+                        <li><a href="/" class="text-blue-500">Kreu</a></li>
+                        <li><a href="/sq/sherbime/" class="hover:text-blue-500 transition-colors">Shërbimet</a></li>
+                        <li><a href="/sq/projekte/" class="hover:text-blue-500 transition-colors">Portofoli i Projekteve</a></li>
+                        <li><a href="/sq/rreth_nesh/" class="hover:text-blue-500 transition-colors">Rreth Nesh</a></li>
+                        <li><a href="/sq/kontakte/" class="hover:text-blue-500 transition-colors">Na Kontaktoni</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Shërbimet GIS</h5>
+                    <ul class="space-y-4 text-sm text-slate-400 font-medium">
+                        <li>Analiza Gjeohapësinore</li>
+                        <li>Remote Sensing & Satelitë</li>
+                        <li>Hartografi Dixhitale</li>
+                        <li>WebGIS Development</li>
+                        <li>Trajnime & Konsulencë</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Zyra</h5>
+                    <ul class="space-y-4 text-sm text-slate-400">
+                        <li class="flex items-start gap-3"><svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg><span>Tiranë, Shqipëri</span></li>
+                        <li class="flex items-start gap-3"><svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span>contact@lindimaps.com</span></li>
+                        <li class="flex items-start gap-3"><svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>Hën - Pre | 09:00 - 17:00</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-[11px] text-slate-500 font-bold tracking-widest uppercase">© 2024 LindiMaps Studio. Të gjitha të drejtat të rezervuara.</p>
+                <div class="flex gap-8 text-[11px] text-slate-500 font-bold tracking-widest uppercase">
+                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <button id="scroll-to-top" class="fixed bottom-8 right-8 bg-blue-600 text-white p-5 rounded-2xl shadow-2xl hover:bg-blue-700 transition-all z-[1100] group">
+        <svg class="w-6 h-6 transform group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg>
+    </button>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map', { scrollWheelZoom: false }).setView([41.3275, 19.8187], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
+        L.marker([41.3275, 19.8187]).addTo(map).bindPopup('<b class="text-blue-600 uppercase">LindiMaps Studio</b>');
+
+        const satellite = document.getElementById('satellite-scanner');
+        const mapEl = document.getElementById('map');
+        let angle = 0;
+        function animateSatellite() {
+            const rect = mapEl.getBoundingClientRect();
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const radiusX = rect.width * 0.35;
+            const radiusY = rect.height * 0.30;
+            const x = centerX + radiusX * Math.cos(angle);
+            const y = centerY + radiusY * Math.sin(angle);
+            satellite.style.left = `${x}px`;
+            satellite.style.top = `${y}px`;
+            angle += 0.005;
+            requestAnimationFrame(animateSatellite);
+        }
+        window.onload = animateSatellite;
+
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+
+        const scrollTopBtn = document.getElementById('scroll-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 500) {
+                scrollTopBtn.classList.add('show');
+            } else {
+                scrollTopBtn.classList.remove('show');
+            }
+        });
+        scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+        const tabs = document.querySelectorAll('.service-tab');
+        const panels = document.querySelectorAll('.service-panel');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.target).classList.add('active');
+            });
+        });
+
+        const counters = document.querySelectorAll('.stat-number');
+        const counterObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const el = entry.target;
+                const target = +el.dataset.count;
+                let current = 0;
+                const increment = Math.max(1, Math.ceil(target / 40));
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        el.textContent = target;
+                        clearInterval(timer);
+                    } else {
+                        el.textContent = current;
+                    }
+                }, 30);
+                counterObserver.unobserve(el);
+            });
+        }, { threshold: 0.4 });
+        counters.forEach(counter => counterObserver.observe(counter));
+    </script>
+</body>
+</html>
