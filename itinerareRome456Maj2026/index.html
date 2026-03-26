@@ -47,6 +47,9 @@
         .info-tag {
             @apply flex items-center gap-2 text-xs font-semibold py-1 px-3 rounded-full mb-2;
         }
+        .timeline-box {
+            @apply bg-slate-100 border-l-4 border-amber-500 p-4 mb-8 rounded-r-xl text-sm;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -67,10 +70,24 @@
 
         <!-- DITA 1 -->
         <div class="mb-24" id="dita1">
-            <h2 class="text-4xl font-black text-amber-600 mb-12 flex items-center serif">
+            <h2 class="text-4xl font-black text-amber-600 mb-6 flex items-center serif">
                 <span class="bg-amber-600 text-white w-12 h-12 rounded-xl flex items-center justify-center mr-4 text-2xl shadow-lg shadow-amber-200">1</span>
                 Dita 1: Roma Antike
             </h2>
+            
+            <!-- Kronologjia Dita 1 -->
+            <div class="timeline-box border-amber-500">
+                <h4 class="font-bold mb-2 uppercase tracking-wider text-amber-700">Kronologjia e Ditës:</h4>
+                <ul class="space-y-1 italic">
+                    <li><strong>08:30 AM:</strong> Mbërritja te Koloseu (Vizita: 1.5 - 2 orë)</li>
+                    <li><strong>10:30 AM:</strong> Forumi Romak & Palatine (Vizita: 1.5 orë)</li>
+                    <li><strong>12:30 PM:</strong> Dreka te Hostaria al Gladiatore (1 orë)</li>
+                    <li><strong>02:30 PM:</strong> Piazza Venezia & Altare della Patria (Vizita: 1 orë)</li>
+                    <li><strong>04:30 PM:</strong> Teatro di Marcello & Ghetto (Shëtitje: 1 orë)</li>
+                    <li><strong>07:30 PM:</strong> Darka te Ba'Ghetto</li>
+                </ul>
+            </div>
+
             <div class="space-y-16">
                 <!-- 1.1 Koloseu -->
                 <div class="relative pl-12 group">
@@ -82,14 +99,14 @@
                         </div>
                         <div class="p-8">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-clock"></i> Ora më e mirë: 08:30 AM</span>
-                                <span class="info-tag bg-blue-100 text-blue-800"><i class="fas fa-book-open"></i> Ndërtuar në vitin 80 m.K.</span>
+                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-clock"></i> Ora: 08:30 AM</span>
+                                <span class="info-tag bg-blue-100 text-blue-800"><i class="fas fa-hourglass-half"></i> Kohëzgjatja: 2 orë</span>
                             </div>
                             <h3 class="text-2xl font-bold mb-2">Koloseu</h3>
                             <p class="text-slate-600 mb-4 italic">Amfiteatri më i madh në botë. Pak histori: Këtu zhvilloheshin luftimet e gladiatorëve para 50,000 spektatorëve.</p>
                             
                             <a href="https://www.google.com/maps/search/?api=1&query=Hostaria+al+Gladiatore+Rome" target="_blank" class="mb-4 flex items-center justify-center w-full bg-emerald-50 text-emerald-700 py-3 rounded-xl font-bold border-2 border-dashed border-emerald-200 hover:bg-emerald-100 transition-all">
-                                <i class="fas fa-utensils mr-2"></i> DREKA: Hostaria al Gladiatore
+                                <i class="fas fa-utensils mr-2"></i> DREKA (12:30 PM): Hostaria al Gladiatore
                             </a>
 
                             <a href="https://www.google.com/maps/dir/?api=1&destination=Colosseum" target="_blank" class="flex items-center justify-center w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-amber-600 transition-colors shadow-lg">
@@ -109,8 +126,8 @@
                         </div>
                         <div class="p-8">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-sun"></i> Vizitoni para 11:00 AM</span>
-                                <span class="info-tag bg-emerald-100 text-emerald-800"><i class="fas fa-landmark"></i> Zemra e Perandorisë</span>
+                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-clock"></i> Ora: 10:30 AM</span>
+                                <span class="info-tag bg-emerald-100 text-emerald-800"><i class="fas fa-hourglass-half"></i> Kohëzgjatja: 1.5 orë</span>
                             </div>
                             <h3 class="text-2xl font-bold mb-2">Forumi Romak & Palatine</h3>
                             <p class="text-slate-600 mb-4 italic">Zemra politike dhe tregtare e Romës së lashtë. Këtu ndodhen mbetjet e tempujve më të rëndësishëm të historisë.</p>
@@ -131,8 +148,8 @@
                         </div>
                         <div class="p-8">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="info-tag bg-slate-100 text-slate-800"><i class="fas fa-arrow-up"></i> Terasë: 03:00 PM</span>
-                                <span class="info-tag bg-red-100 text-red-800"><i class="fas fa-monument"></i> Altare della Patria</span>
+                                <span class="info-tag bg-slate-100 text-slate-800"><i class="fas fa-clock"></i> Ora: 02:30 PM</span>
+                                <span class="info-tag bg-red-100 text-red-800"><i class="fas fa-hourglass-half"></i> Kohëzgjatja: 1 orë</span>
                             </div>
                             <h3 class="text-2xl font-bold mb-2">Piazza Venezia</h3>
                             <p class="text-slate-600 mb-4 italic">Vendi ku historia e lashtë takohet me epokën moderne. Monumenti i bardhë gjigand i kushtohet mbretit të parë të Italisë.</p>
@@ -152,14 +169,14 @@
                         </div>
                         <div class="p-8">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-moon"></i> Pas 07:00 PM</span>
-                                <span class="info-tag bg-purple-100 text-purple-800"><i class="fas fa-mask"></i> 13 para Krishtit</span>
+                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-clock"></i> Ora: 04:30 PM</span>
+                                <span class="info-tag bg-purple-100 text-purple-800"><i class="fas fa-moon"></i> Darka: 07:30 PM</span>
                             </div>
                             <h3 class="text-2xl font-bold mb-2">Teatro di Marcello</h3>
                             <p class="text-slate-600 mb-4 italic">Shpesh i ngatërruar me Koloseun, ky teatër shërbeu si model arkitekturor. Një xhevahir i fshehur.</p>
 
                             <a href="https://www.google.com/maps/search/?api=1&query=Ba'Ghetto+Rome" target="_blank" class="mb-4 flex items-center justify-center w-full bg-amber-50 text-amber-700 py-3 rounded-xl font-bold border-2 border-dashed border-amber-200 hover:bg-amber-100 transition-all">
-                                <i class="fas fa-utensils mr-2"></i> DARKA: Ba'Ghetto (Ghetto Ebraico)
+                                <i class="fas fa-utensils mr-2"></i> DARKA (07:30 PM): Ba'Ghetto
                             </a>
 
                             <a href="https://www.google.com/maps/dir/?api=1&origin=Piazza+Venezia&destination=Teatro+di+Marcello" target="_blank" class="flex items-center justify-center w-full bg-amber-600 text-white py-4 rounded-xl font-bold hover:bg-amber-700 transition-colors shadow-lg">
@@ -173,10 +190,25 @@
 
         <!-- DITA 2 -->
         <div class="mb-24" id="dita2">
-            <h2 class="text-4xl font-black text-blue-600 mb-12 flex items-center serif">
+            <h2 class="text-4xl font-black text-blue-600 mb-6 flex items-center serif">
                 <span class="bg-blue-600 text-white w-12 h-12 rounded-xl flex items-center justify-center mr-4 text-2xl shadow-lg shadow-blue-200">2</span>
                 Dita 2: Shpirti Barok
             </h2>
+
+            <!-- Kronologjia Dita 2 -->
+            <div class="timeline-box border-blue-500">
+                <h4 class="font-bold mb-2 uppercase tracking-wider text-blue-700">Kronologjia e Ditës:</h4>
+                <ul class="space-y-1 italic">
+                    <li><strong>08:00 AM:</strong> Fontana di Trevi (Vizita: 45 min)</li>
+                    <li><strong>09:30 AM:</strong> Pantheon (Vizita: 1 orë)</li>
+                    <li><strong>11:30 AM:</strong> Xhelato te Giolitti</li>
+                    <li><strong>01:00 PM:</strong> Dreka pranë Piazza Navona (1 orë)</li>
+                    <li><strong>03:00 PM:</strong> Piazza Navona (Shëtitje: 1.5 orë)</li>
+                    <li><strong>05:30 PM:</strong> Castel Sant'Angelo (Vizita: 1.5 orë)</li>
+                    <li><strong>08:00 PM:</strong> Darka në Qendër</li>
+                </ul>
+            </div>
+
             <div class="space-y-16">
                 <!-- 2.1 Trevi -->
                 <div class="relative pl-12 group">
@@ -188,8 +220,8 @@
                         </div>
                         <div class="p-8">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="info-tag bg-blue-100 text-blue-800"><i class="fas fa-clock"></i> Para 08:00 AM</span>
-                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-coins"></i> Hidhi 2 monedha</span>
+                                <span class="info-tag bg-blue-100 text-blue-800"><i class="fas fa-clock"></i> Ora: 08:00 AM</span>
+                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-hourglass-half"></i> Kohë: 45 min</span>
                             </div>
                             <h3 class="text-2xl font-bold mb-2">Fontana di Trevi</h3>
                             <p class="text-slate-600 mb-6 italic">Kryevepra e Nicola Salvi. Një monedhë për t'u kthyer në Romë, dy për dashuri.</p>
@@ -206,18 +238,18 @@
                     <div class="absolute left-0 top-0 w-10 h-10 bg-white border-4 border-blue-600 rounded-full flex items-center justify-center font-bold text-blue-600 z-10 shadow-sm">2</div>
                     <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
                         <div class="img-container">
-                            <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2e/7e/09/00/caption.jpg?w=1200&h=-1&s=1" class="w-full h-full object-cover card-img-hover" alt="Pantheon">
+                            <img src="https://monitor.al/wp-content/uploads/2024/08/Panteoni-Rome-4-scaled-1-1024x576.jpg" class="w-full h-full object-cover card-img-hover" alt="Pantheon">
                         </div>
                         <div class="p-8">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-sun"></i> 12:00 PM (Dritë perfekte)</span>
-                                <span class="info-tag bg-slate-100 text-slate-800"><i class="fas fa-university"></i> Tempulli i Perëndive</span>
+                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-clock"></i> Ora: 09:30 AM</span>
+                                <span class="info-tag bg-slate-100 text-slate-800"><i class="fas fa-hourglass-half"></i> Kohë: 1 orë</span>
                             </div>
                             <h3 class="text-2xl font-bold mb-2">Panteoni</h3>
                             <p class="text-slate-600 mb-4 italic">Kupola me vrimë (Oculus) është një mrekulli inxhinierike 2000 vjeçare.</p>
 
                             <a href="https://www.google.com/maps/search/?api=1&query=Giolitti+Rome" target="_blank" class="mb-4 flex items-center justify-center w-full bg-blue-50 text-blue-700 py-3 rounded-xl font-bold border-2 border-dashed border-blue-200 hover:bg-blue-100 transition-all">
-                                <i class="fas fa-ice-cream mr-2"></i> XHELATO: Giolitti (Më e mira!)
+                                <i class="fas fa-ice-cream mr-2"></i> XHELATO (11:30 AM): Giolitti
                             </a>
 
                             <a href="https://www.google.com/maps/dir/?api=1&origin=Trevi+Fountain&destination=Pantheon+Rome" target="_blank" class="flex items-center justify-center w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-100">
@@ -233,12 +265,12 @@
                     <div class="absolute left-0 top-0 w-10 h-10 bg-white border-4 border-blue-600 rounded-full flex items-center justify-center font-bold text-blue-600 z-10 shadow-sm">3</div>
                     <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
                         <div class="img-container">
-                            <img src="https://media.istockphoto.com/id/1372134569/photo/piazza-navona-square-in-rome-italy-built-on-the-site-of-the-stadium-of-domitian-in-rome-rome.jpg?s=612x612&w=0&k=20&c=yRi9W9qx0Brf5v_3TQ8EGCo4qfPiViJY_dbjt4LMyIQ=" class="w-full h-full object-cover card-img-hover" alt="Piazza Navona">
+                            <img src="https://images.unsplash.com/photo-1520175480921-4edfa2983e0f?auto=format&fit=crop&w=1000&q=80" class="w-full h-full object-cover card-img-hover" alt="Piazza Navona">
                         </div>
                         <div class="p-8">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="info-tag bg-blue-100 text-blue-800"><i class="fas fa-coffee"></i> 04:00 PM</span>
-                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-palette"></i> Fontana e 4 Lumenjve</span>
+                                <span class="info-tag bg-blue-100 text-blue-800"><i class="fas fa-clock"></i> Ora: 03:00 PM</span>
+                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-palette"></i> Shëtitje: 1.5 orë</span>
                             </div>
                             <h3 class="text-2xl font-bold mb-2">Piazza Navona</h3>
                             <p class="text-slate-600 mb-6 italic">Sheshi i artistëve dhe i tre fontanave baroke të Berninit.</p>
@@ -258,8 +290,8 @@
                         </div>
                         <div class="p-8">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="info-tag bg-red-100 text-red-800"><i class="fas fa-camera"></i> Pamja: 06:30 PM</span>
-                                <span class="info-tag bg-blue-100 text-blue-800"><i class="fas fa-shield-alt"></i> Ish-Mausoleum</span>
+                                <span class="info-tag bg-red-100 text-red-800"><i class="fas fa-clock"></i> Ora: 05:30 PM</span>
+                                <span class="info-tag bg-blue-100 text-blue-800"><i class="fas fa-hourglass-half"></i> Vizita: 1.5 orë</span>
                             </div>
                             <h3 class="text-2xl font-bold mb-2">Castel Sant'Angelo</h3>
                             <p class="text-slate-600 mb-6 italic">Kalaja e famshme që lidhet me Vatikanin përmes "Passetto".</p>
@@ -274,10 +306,24 @@
 
         <!-- DITA 3 -->
         <div class="mb-24" id="dita3">
-            <h2 class="text-4xl font-black text-emerald-600 mb-12 flex items-center serif">
+            <h2 class="text-4xl font-black text-emerald-600 mb-6 flex items-center serif">
                 <span class="bg-emerald-600 text-white w-12 h-12 rounded-xl flex items-center justify-center mr-4 text-2xl shadow-lg shadow-emerald-200">3</span>
                 Dita 3: Vatikani & Shpirti Romak
             </h2>
+
+            <!-- Kronologjia Dita 3 -->
+            <div class="timeline-box border-emerald-500">
+                <h4 class="font-bold mb-2 uppercase tracking-wider text-emerald-700">Kronologjia e Ditës:</h4>
+                <ul class="space-y-1 italic">
+                    <li><strong>08:30 AM:</strong> Muzetë e Vatikanit (Vizita: 3 orë)</li>
+                    <li><strong>12:00 PM:</strong> Bazilika e Shën Pjetrit & Kupola (Vizita: 2 orë)</li>
+                    <li><strong>02:30 PM:</strong> Dreka pranë Vatikanit (1 orë)</li>
+                    <li><strong>04:30 PM:</strong> Shëtitje drejt Gianicolo (1 orë)</li>
+                    <li><strong>06:30 PM:</strong> Perëndimi në Gianicolo (Pamja: 1 orë)</li>
+                    <li><strong>08:30 PM:</strong> Darka te Tonnarello (Trastevere)</li>
+                </ul>
+            </div>
+
             <div class="space-y-16">
                 <!-- 3.1 Muzetë -->
                 <div class="relative pl-12 group">
@@ -289,8 +335,8 @@
                         </div>
                         <div class="p-8">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="info-tag bg-emerald-100 text-emerald-800"><i class="fas fa-ticket-alt"></i> Rezervo 09:00 AM</span>
-                                <span class="info-tag bg-red-100 text-red-800"><i class="fas fa-user-shield"></i> Dress code</span>
+                                <span class="info-tag bg-emerald-100 text-emerald-800"><i class="fas fa-clock"></i> Ora: 08:30 AM</span>
+                                <span class="info-tag bg-red-100 text-red-800"><i class="fas fa-hourglass-half"></i> Kohë: 3 orë</span>
                             </div>
                             <h3 class="text-2xl font-bold mb-2">Muzetë e Vatikanit</h3>
                             <p class="text-slate-600 mb-6 italic">Koleksionet më të rëndësishme artistike dhe Kapela Sistine.</p>
@@ -311,8 +357,8 @@
                         </div>
                         <div class="p-8">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="info-tag bg-emerald-100 text-emerald-800"><i class="fas fa-arrow-up"></i> Kupola: 12:30 PM</span>
-                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-star"></i> Michelangelo & Bernini</span>
+                                <span class="info-tag bg-emerald-100 text-emerald-800"><i class="fas fa-clock"></i> Ora: 12:00 PM</span>
+                                <span class="info-tag bg-amber-100 text-amber-800"><i class="fas fa-hourglass-half"></i> Kohë: 2 orë</span>
                             </div>
                             <h3 class="text-2xl font-bold mb-2">Bazilika e Shën Pjetrit</h3>
                             <p class="text-slate-600 mb-6 italic">Qendra e botës katolike me arkitekturë hyjnore.</p>
@@ -333,8 +379,8 @@
                         </div>
                         <div class="p-8">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="info-tag bg-emerald-100 text-emerald-800"><i class="fas fa-magic"></i> Perëndimi: 07:15 PM</span>
-                                <span class="info-tag bg-blue-100 text-blue-800"><i class="fas fa-binoculars"></i> Panorama Romës</span>
+                                <span class="info-tag bg-emerald-100 text-emerald-800"><i class="fas fa-clock"></i> Ora: 06:30 PM</span>
+                                <span class="info-tag bg-blue-100 text-blue-800"><i class="fas fa-hourglass-half"></i> Pamja: 1 orë</span>
                             </div>
                             <h3 class="text-2xl font-bold mb-2">Pamja nga Janiculum (Gianicolo)</h3>
                             <p class="text-slate-600 mb-6 italic">Vendi më romantik për perëndimin e diellit mbi çatitë e Romës.</p>
@@ -354,15 +400,14 @@
                         </div>
                         <div class="p-8">
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="info-tag bg-emerald-100 text-emerald-800"><i class="fas fa-wine-glass-alt"></i> Darka: 09:00 PM</span>
-                                <span class="info-tag bg-red-100 text-red-800"><i class="fas fa-heart"></i> Shpirti i Romës</span>
+                                <span class="info-tag bg-emerald-100 text-emerald-800"><i class="fas fa-clock"></i> Darka: 08:30 PM</span>
+                                <span class="info-tag bg-red-100 text-red-800"><i class="fas fa-heart"></i> Mbrëmje e lirë</span>
                             </div>
                             <h3 class="text-2xl font-bold mb-2">Lagja Trastevere</h3>
                             <p class="text-slate-600 mb-4 italic">Mbylleni udhëtimin me një darkë tradicionale dhe atmosferë magjike.</p>
 
-                            <!-- Butoni i ri për lokacionin e restorantit -->
                             <a href="https://www.google.com/maps/search/?api=1&query=Tonnarello+Trastevere+Rome" target="_blank" class="mb-4 flex items-center justify-center w-full bg-emerald-50 text-emerald-700 py-4 rounded-xl font-bold border-2 border-dashed border-emerald-200 hover:bg-emerald-100 transition-all shadow-sm">
-                                <i class="fas fa-utensils mr-2"></i> LOKACIONI DARKA: Tonnarello
+                                <i class="fas fa-utensils mr-2"></i> LOKACIONI DARKA (08:30 PM): Tonnarello
                             </a>
 
                             <a href="https://www.google.com/maps/dir/?api=1&origin=Gianicolo&destination=Trastevere+Rome" target="_blank" class="flex items-center justify-center w-full bg-emerald-600 text-white py-4 rounded-xl font-bold hover:bg-emerald-700 transition-colors shadow-lg">
@@ -378,7 +423,7 @@
     <footer class="bg-slate-900 text-white py-20 px-4 text-center">
         <div class="serif italic text-4xl mb-8 text-amber-500 underline underline-offset-8">Arlind & Arjola</div>
         <div class="max-w-2xl mx-auto">
-            <p class="text-slate-400 text-lg leading-relaxed mb-8">Udhëzuesi i përditësuar me oraret AM/PM dhe butonat direkt për lokacionet e ushqimit. Shijoni çdo moment!</p>
+            <p class="text-slate-400 text-lg leading-relaxed mb-8">Udhëzuesi i përditësuar me kronologjinë e detajuar dhe oraret AM/PM për çdo aktivitet. Udhëtim të mbarë!</p>
             <div class="flex justify-center space-x-6 text-2xl">
                 <i class="fas fa-camera text-amber-500/50"></i>
                 <i class="fas fa-heart text-amber-500/50"></i>
